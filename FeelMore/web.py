@@ -21,15 +21,18 @@ def crawler(url):
 			break
 	return return_list
 
-def papago(msg):
+def papago(msg, reverse=False):
 	client_id = "Jla6vYutR83S4LVVoSDi"
 	client_secret = "hwSYhBaw4F"
 	encText = urllib.parse.quote(msg)
-	data = "source=en&target=ko&text=" + encText
 	url = "https://openapi.naver.com/v1/papago/n2mt"
 	request = urllib.request.Request(url)
 	request.add_header("X-Naver-Client-Id",client_id)
 	request.add_header("X-Naver-Client-Secret",client_secret)
+	if not reverse:
+		data = "source=en&target=ko&text=" + encText
+	else:
+		data = "source=ko&target=en&text=" + encText
 	response = urllib.request.urlopen(request, data=data.encode("utf-8"))
 	rescode = response.getcode()
 	if(rescode==200):
