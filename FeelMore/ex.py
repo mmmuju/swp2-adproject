@@ -29,19 +29,29 @@ class Button(QToolButton):
 class Menu(QWidget):
     def __init__(self, parent=None):
         super(Menu, self).__init__(parent)
-        layout = QHBoxLayout()
+        layout = QVBoxLayout()
+        title_layout = QHBoxLayout()
+        menu_layout = QHBoxLayout()
+        self.title = QLabel("FeelMore")
         self.word_button = QPushButton("단어 공부하기")
         self.word_button.setFixedHeight(200)
 
-        self.diction_button = QPushButton("발음 체크하기")
+        self.diction_button = QPushButton("발음 확인하기")
         self.diction_button.setFixedHeight(200)
 
         self.writing_button = QPushButton("영작 연습하기")
         self.writing_button.setFixedHeight(200)
 
-        layout.addWidget(self.word_button)
-        layout.addWidget(self.diction_button)
-        layout.addWidget(self.writing_button)
+        title_layout.addWidget(self.title)
+        title_layout.setAlignment(Qt.AlignCenter)
+        menu_layout.addWidget(self.word_button)
+        menu_layout.addWidget(self.diction_button)
+        menu_layout.addWidget(self.writing_button)
+        layout.addStretch(1)
+        layout.addLayout(title_layout)
+        layout.addStretch(1)
+        layout.addLayout(menu_layout)
+        layout.addStretch(1)
         self.setLayout(layout)
 
 
@@ -75,22 +85,60 @@ class Functions(QWidget):
                     c = 0
                     r += 1
             self.exit_button = QPushButton("메뉴로", self)
-            # self.display = QLineEdit()
-            # self.display.setReadOnly(True)
-            # self.display.setAlignment(Qt.AlignLeft)
-            # self.display.setMaxLength(30)
+            # Layout
+            mainLayout = QGridLayout()
+            mainLayout.setSizeConstraint(QLayout.SetFixedSize)
+            mainLayout.addWidget(self.exit_button, 0, 0)
+            mainLayout.addLayout(countryLayout, 1, 0)
+            mainLayout.addLayout(countryLayout, 2, 0)
+            mainLayout.addLayout(wordLayout, 3, 0)
+            self.setLayout(mainLayout)
 
-        # Layout
-        mainLayout = QGridLayout()
-        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
-        mainLayout.addWidget(self.exit_button, 0, 0)
-        # mainLayout.addWidget(self.display, 1, 0)
+        elif sender == "발음 확인하기":
+            layout = QVBoxLayout()
+            exit_layout = QHBoxLayout()
+            exit_layout.addStretch(1)
+            self.exit_button = QPushButton("메뉴로", self)
+            exit_layout.addWidget(self.exit_button)
+            layout.addLayout(exit_layout)
+            main_layout = QHBoxLayout()
+            text = '''웹사이트를 참고하세요!\n도움말: 앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠'''
+            self.instruction = QLabel(text)
+            main_layout.addWidget(self.instruction)
+            main_layout.setAlignment(Qt.AlignCenter)
+            layout.addLayout(main_layout)
+            self.setLayout(layout)
 
-        mainLayout.addLayout(countryLayout, 1, 0)
-        mainLayout.addLayout(countryLayout, 2, 0)
-        mainLayout.addLayout(wordLayout, 3, 0)
+        elif sender == "영작 연습하기":
+            layout = QVBoxLayout()
+            exit_layout = QHBoxLayout()
+            exit_layout.addStretch(1)
+            self.exit_button = QPushButton("메뉴로", self)
+            exit_layout.addWidget(self.exit_button)
+            layout.addLayout(exit_layout)
+            main_layout = QVBoxLayout()
+            button_layout = QHBoxLayout()
+            self.draft_input = QTextEdit()
+            self.korean_input = QLineEdit()
+            self.copy_button = QPushButton("클립보드에 복사")
+            self.to_eng_button = QPushButton("영어로")
+            self.read_button = QPushButton("읽어주기")
+            self.copy_button.clicked.connect(self.copy)
+            self.to_eng_button.clicked.connect(self.korToEng)
+            self.korean_input.setFixedWidth(300)
+            main_layout.addStretch(1)
+            main_layout.addWidget(self.draft_input)
+            button_layout.addWidget(self.copy_button)
+            button_layout.addStretch(1)
+            button_layout.addWidget(self.korean_input)
+            button_layout.addWidget(self.to_eng_button)
+            button_layout.addWidget(self.read_button)
+            main_layout.addLayout(button_layout)
+            main_layout.addStretch(1)
+            layout.addLayout(main_layout) # self.setLayout(mainLayout)
+            self.setLayout(layout)
 
-        self.setLayout(mainLayout)
+
 
     def play_music(self, music_file, volume=0.8):
         '''
@@ -152,13 +200,15 @@ class Main(QMainWindow):
         self.startMenu()
 
     def startMenu(self):
+        self.setStyleSheet('font-size: 20pt; font-family: Courier;')
         self.window = Menu(self)
         self.setWindowTitle("FeelMore")
         self.setCentralWidget(self.window)
-        self.window.word_button.clicked.connect(self.callback)
+        self.window.word_button.clicked.connect(self.useFunctions)
         self.show()
 
-    def callback(self):
+    def useFunctions(self):
+        self.setStyleSheet('font-size: 11pt; font-family: Courier;')
         self.window = Functions(self)
         self.setWindowTitle(self.sender().text())
         self.setCentralWidget(self.window)
