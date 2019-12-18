@@ -9,9 +9,11 @@ from gtts import gTTS
 import pygame as pg
 import random
 import pyperclip
+from Vocabulary import Vocabulary
+from Writing import Writing
 
 word_list = web.crawler("https://www.vocabulary.com/lists/274832")
-
+menuOrder = ["단어 공부하기", "발음 확인하기", "영작 연습하기"]
 
 class Button(QToolButton):
 
@@ -35,14 +37,11 @@ class Menu(QWidget):
         title_layout = QHBoxLayout()
         menu_layout = QHBoxLayout()
         self.title = QLabel("FeelMore")
-        self.word_button = QPushButton("단어 공부하기")
-        self.word_button.setFixedHeight(200)
-
-        self.diction_button = QPushButton("발음 확인하기")
-        self.diction_button.setFixedHeight(200)
-
-        self.writing_button = QPushButton("영작 연습하기")
-        self.writing_button.setFixedHeight(200)
+        self.menu_btn = []
+        
+        for i, n in enumerate(menuOrder):
+            self.menu_btn[n] = QPushButton(i)
+            self.menu_btn[n].setFixedHeight(200)
 
         title_layout.addWidget(self.title)
         title_layout.setAlignment(Qt.AlignCenter)
@@ -56,11 +55,9 @@ class Menu(QWidget):
         layout.addStretch(1)
         self.setLayout(layout)
 
-
 class Functions(QWidget):
     def __init__(self, parent=None):
         super(Functions, self).__init__(parent)
-
         sender = self.sender().text()
         layout = QVBoxLayout()
         exit_layout = QHBoxLayout()
@@ -69,44 +66,7 @@ class Functions(QWidget):
         exit_layout.addWidget(self.exit_button)
         layout.addLayout(exit_layout)
 
-        if sender == "단어 공부하기" or sender == "단어 섞기":
-            if sender == "단어 섞기":
-                random.shuffle(word_list)
-            self.words = word_list[:40]
-            word_layout = QGridLayout()
-            country_layout = QGridLayout()
-            self.shuffle_btn = QPushButton("단어 섞기")
-            self.country = QComboBox()
-            self.country.addItem("US")
-            self.country.addItem("UK")
-            self.country.addItem("CA")
-            self.eng_display = QLineEdit()
-            self.eng_display.setReadOnly(True)
-            self.eng_display.setAlignment(Qt.AlignLeft)
-            self.eng_display.setMaxLength(30)
-            self.kor_display = QLineEdit()
-            self.kor_display.setReadOnly(True)
-            self.kor_display.setAlignment(Qt.AlignLeft)
-            self.kor_display.setMaxLength(30)
-            country_layout.addWidget(self.eng_display, 0, 0)
-            country_layout.addWidget(self.kor_display, 1, 0)
-            country_layout.addWidget(self.country, 0, 1)
-            r, c = 0, 0
-            for btnText in self.words:
-                button = Button(btnText, self.buttonClicked)
-                word_layout.addWidget(button, r, c)
-                c += 1
-                if c >= 5:
-                    c = 0
-                    r += 1
-            main_layout = QVBoxLayout()
-            main_layout.addLayout(country_layout)
-            main_layout.addLayout(word_layout)
-            main_layout.addWidget(self.shuffle_btn)
-            layout.addLayout(main_layout)
-            self.setLayout(layout)
-
-        elif sender == "발음 확인하기":
+        if sender == "발음 확인하기":
             main_layout = QHBoxLayout()
             text = '''웹사이트를 참고하세요!\n도움말: 앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠'''
             self.instruction = QLabel(text)
@@ -210,21 +170,22 @@ class Main(QMainWindow):
         self.window = Menu(self)
         self.setWindowTitle("FeelMore")
         self.setCentralWidget(self.window)
-        self.window.word_button.clicked.connect(self.useFunctions)
-        self.window.diction_button.clicked.connect(self.useFunctions)
-        self.window.writing_button.clicked.connect(self.useFunctions)
+        self.window.menu_btn[0].clicked.connect(self.useFunctions)
+        self.window.menu_btn[0].clicked.connect(self.useFunctions)
+        self.window.menu_btn[0].clicked.connect(self.useFunctions)
         self.show()
 
     def useFunctions(self):
         self.setStyleSheet('font-size: 11pt; font-family: Courier;')
-        self.window = Functions(self)
-        self.setWindowTitle(self.sender().text())
+        sender = self.sender().text()
+        if sender == menuOrder[0]:
+            self.window = Vocabulary()
+        elif sender == menuOrder[1]:
+        elif sender == menuOrder[2]:
+            self.window = Writing()
         self.setCentralWidget(self.window)
         self.window.exit_button.clicked.connect(self.startMenu)
-        self.window.shuffle_btn.clicked.connect(self.useFunctions)
         self.show()
-
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
