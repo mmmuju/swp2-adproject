@@ -39,15 +39,13 @@ class Menu(QWidget):
         self.title = QLabel("FeelMore")
         self.menu_btn = []
         
-        for i, n in enumerate(menuOrder):
-            self.menu_btn[n] = QPushButton(i)
+        for n, i in enumerate(menuOrder):
+            self.menu_btn.append(QPushButton(i))
             self.menu_btn[n].setFixedHeight(200)
+            menu_layout.addWidget(self.menu_btn[n])
 
         title_layout.addWidget(self.title)
         title_layout.setAlignment(Qt.AlignCenter)
-        menu_layout.addWidget(self.word_button)
-        menu_layout.addWidget(self.diction_button)
-        menu_layout.addWidget(self.writing_button)
         layout.addStretch(1)
         layout.addLayout(title_layout)
         layout.addStretch(1)
@@ -65,6 +63,7 @@ class Functions(QWidget):
         self.exit_button = QPushButton("메뉴로", self)
         exit_layout.addWidget(self.exit_button)
         layout.addLayout(exit_layout)
+        self.shuffle_btn = QPushButton()
 
         if sender == "발음 확인하기":
             main_layout = QHBoxLayout()
@@ -171,20 +170,27 @@ class Main(QMainWindow):
         self.setWindowTitle("FeelMore")
         self.setCentralWidget(self.window)
         self.window.menu_btn[0].clicked.connect(self.useFunctions)
-        self.window.menu_btn[0].clicked.connect(self.useFunctions)
-        self.window.menu_btn[0].clicked.connect(self.useFunctions)
+        self.window.menu_btn[1].clicked.connect(self.useFunctions)
+        self.window.menu_btn[2].clicked.connect(self.useFunctions)
         self.show()
 
     def useFunctions(self):
         self.setStyleSheet('font-size: 11pt; font-family: Courier;')
         sender = self.sender().text()
-        if sender == menuOrder[0]:
+        print(sender)
+        if sender == menuOrder[0] or sender == "단어 섞기":
+            print('a')
             self.window = Vocabulary()
         elif sender == menuOrder[1]:
+            print("d")
         elif sender == menuOrder[2]:
             self.window = Writing()
         self.setCentralWidget(self.window)
         self.window.exit_button.clicked.connect(self.startMenu)
+        try:
+            self.window.shuffle_btn.clicked.connect(self.useFunctions)
+        except:
+            pass
         self.show()
 
 if __name__ == '__main__':

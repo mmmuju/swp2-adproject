@@ -11,7 +11,6 @@ import web
 word_list = web.crawler("https://www.vocabulary.com/lists/274832")
 
 class Button(QToolButton):
-
     def __init__(self, text, callback):
         super().__init__()
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
@@ -26,7 +25,6 @@ class Button(QToolButton):
 
 
 class Vocabulary(QWidget):
-
     def __init__(self, parent=None):
         super(Vocabulary, self).__init__(parent)
         self.initLayout()
@@ -38,8 +36,7 @@ class Vocabulary(QWidget):
         self.exit_button = QPushButton("메뉴로", self)
         exit_layout.addWidget(self.exit_button)
         self.layout.addLayout(exit_layout)
-        self.shuffle_btn = Button("단어 섞기", self.wordClicked)
-
+        self.shuffle_btn = Button("단어 섞기", self.shuffleWord)
         self.words = word_list[:40]
         word_layout = QGridLayout()
         country_layout = QGridLayout()
@@ -73,14 +70,14 @@ class Vocabulary(QWidget):
         self.layout.addLayout(main_layout)
         self.setLayout(self.layout)
 
+    def shuffleWord(self):
+        shuffle(word_list)
+
     def wordClicked(self):
         button = self.sender()
         word = button.text()
         self.eng_display.setText("English: " + word)
         self.kor_display.setText("Korean: "+ web.papago(word))
-        if word == "단어 섞기":
-            shuffle(word_list)
-            self.initLayout()
         if self.country.currentText() == "US":
             us = gTTS(text=word, lang='en-us')
             us_file = "us.mp3"
