@@ -4,19 +4,13 @@ from PyQt5.QtWidgets import (QWidget, QPushButton,
                              QToolButton, QSizePolicy, QStackedWidget, QLayout)
 from random import shuffle
 from PyQt5.QtCore import Qt
-import web
 from gtts import gTTS
 import pygame as pg
-import random
-import pyperclip
-import sys
 
 import web
 word_list = web.crawler("https://www.vocabulary.com/lists/274832")
 
-
 class Button(QToolButton):
-
     def __init__(self, text, callback):
         super().__init__()
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
@@ -31,54 +25,55 @@ class Button(QToolButton):
 
 
 class Vocabulary(QWidget):
-
     def __init__(self, parent=None):
         super(Vocabulary, self).__init__(parent)
-        sender = self.sender().text()
-        layout = QVBoxLayout()
+        self.initLayout()
+
+    def initLayout(self):
+        self.layout = QVBoxLayout()
         exit_layout = QHBoxLayout()
         exit_layout.addStretch(1)
         self.exit_button = QPushButton("메뉴로", self)
         exit_layout.addWidget(self.exit_button)
-        layout.addLayout(exit_layout)
-        if sender == "단어 공부하기" or sender == "단어 섞기":
-            if sender == "단어 섞기":
-                shuffle(word_list)
-            self.words = word_list[:40]
-            word_layout = QGridLayout()
-            country_layout = QGridLayout()
-            self.shuffle_btn = QPushButton("단어 섞기")
-            self.country = QComboBox()
-            self.country.addItem("US")
-            self.country.addItem("UK")
-            self.country.addItem("CA")
-            self.eng_display = QLineEdit()
-            self.eng_display.setReadOnly(True)
-            self.eng_display.setAlignment(Qt.AlignLeft)
-            self.eng_display.setMaxLength(30)
-            self.kor_display = QLineEdit()
-            self.kor_display.setReadOnly(True)
-            self.kor_display.setAlignment(Qt.AlignLeft)
-            self.kor_display.setMaxLength(30)
-            country_layout.addWidget(self.eng_display, 0, 0)
-            country_layout.addWidget(self.kor_display, 1, 0)
-            country_layout.addWidget(self.country, 0, 1)
-            r, c = 0, 0
-            for btnText in self.words:
-                button = Button(btnText, self.buttonClicked)
-                word_layout.addWidget(button, r, c)
-                c += 1
-                if c >= 5:
-                    c = 0
-                    r += 1
-            main_layout = QVBoxLayout()
-            main_layout.addLayout(country_layout)
-            main_layout.addLayout(word_layout)
-            main_layout.addWidget(self.shuffle_btn)
-            layout.addLayout(main_layout)
-            self.setLayout(layout)
+        self.layout.addLayout(exit_layout)
+        self.shuffle_btn = Button("단어 섞기", self.shuffleWord)
+        self.words = word_list[:40]
+        word_layout = QGridLayout()
+        country_layout = QGridLayout()
+        self.country = QComboBox()
+        self.country.addItem("US")
+        self.country.addItem("UK")
+        self.country.addItem("CA")
+        self.eng_display = QLineEdit()
+        self.eng_display.setReadOnly(True)
+        self.eng_display.setAlignment(Qt.AlignLeft)
+        self.eng_display.setMaxLength(30)
+        self.kor_display = QLineEdit()
+        self.kor_display.setReadOnly(True)
+        self.kor_display.setAlignment(Qt.AlignLeft)
+        self.kor_display.setMaxLength(30)
+        country_layout.addWidget(self.eng_display, 0, 0)
+        country_layout.addWidget(self.kor_display, 1, 0)
+        country_layout.addWidget(self.country, 0, 1)
+        r, c = 0, 0
+        for btnText in self.words:
+            button = Button(btnText, self.wordClicked)
+            word_layout.addWidget(button, r, c)
+            c += 1
+            if c >= 5:
+                c = 0
+                r += 1
+        main_layout = QVBoxLayout()
+        main_layout.addLayout(country_layout)
+        main_layout.addLayout(word_layout)
+        main_layout.addWidget(self.shuffle_btn)
+        self.layout.addLayout(main_layout)
+        self.setLayout(self.layout)
 
-    def buttonClicked(self):
+    def shuffleWord(self):
+        shuffle(word_list)
+
+    def wordClicked(self):
         button = self.sender()
         word = button.text()
         self.eng_display.setText("English: " + word)
