@@ -80,11 +80,16 @@ class Functions(QWidget):
             self.country.addItem("US")
             self.country.addItem("UK")
             self.country.addItem("CA")
-            self.display = QLineEdit()
-            self.display.setReadOnly(True)
-            self.display.setAlignment(Qt.AlignLeft)
-            self.display.setMaxLength(30)
-            country_layout.addWidget(self.display, 0, 0)
+            self.eng_display = QLineEdit()
+            self.eng_display.setReadOnly(True)
+            self.eng_display.setAlignment(Qt.AlignLeft)
+            self.eng_display.setMaxLength(30)
+            self.kor_display = QLineEdit()
+            self.kor_display.setReadOnly(True)
+            self.kor_display.setAlignment(Qt.AlignLeft)
+            self.kor_display.setMaxLength(30)
+            country_layout.addWidget(self.eng_display, 0, 0)
+            country_layout.addWidget(self.kor_display, 1, 0)
             country_layout.addWidget(self.country, 0, 1)
             r, c = 0, 0
             for btnText in self.words:
@@ -168,7 +173,8 @@ class Functions(QWidget):
     def buttonClicked(self):
         button = self.sender()
         word = button.text()
-        self.display.setText("English: " + word + " Korean: "+ web.papago(word))
+        self.eng_display.setText("English: " + word)
+        self.kor_display.setText("Korean: "+ web.papago(word))
         if self.country.currentText() == "US":
             us = gTTS(text=word, lang='en-us')
             us_file = "us.mp3"
