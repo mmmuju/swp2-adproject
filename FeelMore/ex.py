@@ -7,9 +7,10 @@ from PyQt5.QtCore import Qt
 import web
 from gtts import gTTS
 import pygame as pg
+import random
 import pyperclip
 
-url = "https://www.vocabulary.com/lists/274832"
+word_list = web.crawler("https://www.vocabulary.com/lists/274832")
 
 
 class Button(QToolButton):
@@ -61,47 +62,46 @@ class Functions(QWidget):
         super(Functions, self).__init__(parent)
 
         sender = self.sender().text()
-        wordLayout = QGridLayout()
-        countryLayout = QGridLayout()
-        self.country = QComboBox()
-        self.country.addItem("US")
-        self.country.addItem("UK")
-        self.country.addItem("CA")
-        self.display = QLineEdit()
-        self.display.setReadOnly(True)
-        self.display.setAlignment(Qt.AlignLeft)
-        self.display.setMaxLength(30)
-        countryLayout.addWidget(self.display, 0, 0)
-        countryLayout.addWidget(self.country, 0, 1)
+        layout = QVBoxLayout()
+        exit_layout = QHBoxLayout()
+        exit_layout.addStretch(1)
+        self.exit_button = QPushButton("메뉴로", self)
+        exit_layout.addWidget(self.exit_button)
+        layout.addLayout(exit_layout)
 
-        if sender == "단어 공부하기":
-
-            self.word_list = web.crawler("https://www.vocabulary.com/lists/274832")
+        if sender == "단어 공부하기" or sender == "단어 섞기":
+            if sender == "단어 섞기":
+                random.shuffle(word_list)
+            self.words = word_list[:40]
+            word_layout = QGridLayout()
+            country_layout = QGridLayout()
+            self.shuffle_btn = QPushButton("단어 섞기")
+            self.country = QComboBox()
+            self.country.addItem("US")
+            self.country.addItem("UK")
+            self.country.addItem("CA")
+            self.display = QLineEdit()
+            self.display.setReadOnly(True)
+            self.display.setAlignment(Qt.AlignLeft)
+            self.display.setMaxLength(30)
+            country_layout.addWidget(self.display, 0, 0)
+            country_layout.addWidget(self.country, 0, 1)
             r, c = 0, 0
-            for btnText in self.word_list:
+            for btnText in self.words:
                 button = Button(btnText, self.buttonClicked)
-                wordLayout.addWidget(button, r, c)
+                word_layout.addWidget(button, r, c)
                 c += 1
-                if c >= 10:
+                if c >= 5:
                     c = 0
                     r += 1
-            self.exit_button = QPushButton("메뉴로", self)
-            # Layout
-            mainLayout = QGridLayout()
-            mainLayout.setSizeConstraint(QLayout.SetFixedSize)
-            mainLayout.addWidget(self.exit_button, 0, 0)
-            mainLayout.addLayout(countryLayout, 1, 0)
-            mainLayout.addLayout(countryLayout, 2, 0)
-            mainLayout.addLayout(wordLayout, 3, 0)
-            self.setLayout(mainLayout)
+            main_layout = QVBoxLayout()
+            main_layout.addLayout(country_layout)
+            main_layout.addLayout(word_layout)
+            main_layout.addWidget(self.shuffle_btn)
+            layout.addLayout(main_layout)
+            self.setLayout(layout)
 
         elif sender == "발음 확인하기":
-            layout = QVBoxLayout()
-            exit_layout = QHBoxLayout()
-            exit_layout.addStretch(1)
-            self.exit_button = QPushButton("메뉴로", self)
-            exit_layout.addWidget(self.exit_button)
-            layout.addLayout(exit_layout)
             main_layout = QHBoxLayout()
             text = '''웹사이트를 참고하세요!\n도움말: 앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠'''
             self.instruction = QLabel(text)
@@ -111,12 +111,6 @@ class Functions(QWidget):
             self.setLayout(layout)
 
         elif sender == "영작 연습하기":
-            layout = QVBoxLayout()
-            exit_layout = QHBoxLayout()
-            exit_layout.addStretch(1)
-            self.exit_button = QPushButton("메뉴로", self)
-            exit_layout.addWidget(self.exit_button)
-            layout.addLayout(exit_layout)
             main_layout = QVBoxLayout()
             button_layout = QHBoxLayout()
             self.draft_input = QTextEdit()
@@ -136,7 +130,7 @@ class Functions(QWidget):
             button_layout.addWidget(self.read_button)
             main_layout.addLayout(button_layout)
             main_layout.addStretch(1)
-            layout.addLayout(main_layout) # self.setLayout(mainLayout)
+            layout.addLayout(main_layout) # self.setLayout(main_layout)
             self.setLayout(layout)
 
     def copy(self):
@@ -145,6 +139,7 @@ class Functions(QWidget):
     def korToEng(self):
         translated = web.papago(self.korean_input.text()[:300], True)
         self.draft_input.setText(self.draft_input.toPlainText() + " " + translated)
+
 
     def play_music(self, music_file, volume=0.8):
         '''
@@ -162,7 +157,6 @@ class Functions(QWidget):
         clock = pg.time.Clock()
         try:
             pg.mixer.music.load(music_file)
-            print("Music file {} loaded!".format(music_file))
         except pg.error:
             print("File {} not found! ({})".format(music_file, pg.get_error()))
             return
@@ -174,7 +168,7 @@ class Functions(QWidget):
     def buttonClicked(self):
         button = self.sender()
         word = button.text()
-        self.display.setText("English: " + word + " Korean: ")
+        self.display.setText("English: " + word + " Korean: "+ web.papago(word))
         if self.country.currentText() == "US":
             us = gTTS(text=word, lang='en-us')
             us_file = "us.mp3"
@@ -221,6 +215,7 @@ class Main(QMainWindow):
         self.setWindowTitle(self.sender().text())
         self.setCentralWidget(self.window)
         self.window.exit_button.clicked.connect(self.startMenu)
+        self.window.shuffle_btn.clicked.connect(self.useFunctions)
         self.show()
 
 
