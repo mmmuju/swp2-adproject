@@ -1,3 +1,4 @@
+import webbrowser
 import sys
 from PyQt5.QtWidgets import (QWidget, QPushButton,
                              QHBoxLayout, QVBoxLayout, QApplication, QLabel,
@@ -10,6 +11,7 @@ import pygame as pg
 import random
 import pyperclip
 
+
 class CheckDiction(QWidget):
     def __init__(self, parent=None):
         super(CheckDiction, self).__init__(parent)
@@ -21,9 +23,15 @@ class CheckDiction(QWidget):
         layout.addLayout(exit_layout)
         self.shuffle_btn = QPushButton()
         main_layout = QHBoxLayout()
-        text = '''웹사이트를 참고하세요!\n도움말: 앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠앙기모띠'''
+        text = '''웹사이트를 참고하세요!\n도움말: "(en-chicken: cock-a-doodle-doo), (mouse:squeak), 
+               (en-cow: moo~~), (ko-cow: ummuuu), (ko-bird:chak chak), (en-bird:tweet tweet)"
+               '''
+
+        url = "animal.html"
+        webbrowser.open(url)
         self.instruction = QLabel(text)
         main_layout.addWidget(self.instruction)
         main_layout.setAlignment(Qt.AlignCenter)
         layout.addLayout(main_layout)
         self.setLayout(layout)
+
